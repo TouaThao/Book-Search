@@ -7,14 +7,23 @@ import {
   Button,
 } from "react-bootstrap";
 import { useQuery, useMutation } from "@apollo/react-hooks";
-
 import Auth from "../utils/auth";
 import { removeBookId, saveBookIds } from "../utils/localStorage";
-import { QUERY_ME } from "../utils/queries";
+import { GET_ME } from "../utils/queries";
 import { REMOVE_BOOK } from "../utils/mutation";
 
 const SavedBooks = () => {
-  const { loading, data } = useQuery(QUERY_ME);
+  console.log("Start of SavedBooks component");
+  const { loading, data } = useQuery(GET_ME);
+
+  // try {
+  //   const { data, loading } = useQuery(GET_ME);
+  //   console.log("Data:", data);
+  //   console.log("Loading:", loading);
+  // } catch (error) {
+  //   console.error("Error:", error);
+  // }
+
   const userData = data?.me || [];
 
   const [removeBook, { error }] = useMutation(REMOVE_BOOK);
@@ -39,13 +48,11 @@ const SavedBooks = () => {
   };
 
   // if data isn't here yet, say so
-  if (loading) {
-    return <h2>LOADING...</h2>;
-  }
-
-  // sync localStorage with what was returned from the userData query
-  const savedBookIds = userData.savedBooks.map((book) => book.bookId);
-  saveBookIds(savedBookIds);
+  // if (loading) {
+  //   return <h2>LOADING...</h2>;
+  // }
+  // const savedBookIds = userData.savedBooks.map((book) => book.bookId);
+  // saveBookIds(savedBookIds);
 
   return (
     <>
@@ -55,14 +62,14 @@ const SavedBooks = () => {
         </Container>
       </Jumbotron>
       <Container>
-        <h2>
+        {/* <h2>
           {userData.savedBooks.length
             ? `Viewing ${userData.savedBooks.length} saved ${
                 userData.savedBooks.length === 1 ? "book" : "books"
               }:`
             : "You have no saved books!"}
-        </h2>
-        <CardColumns>
+        </h2> */}
+        {/* <CardColumns>
           {userData.savedBooks.map((book) => {
             return (
               <Card key={book.bookId} border="dark">
@@ -87,7 +94,7 @@ const SavedBooks = () => {
               </Card>
             );
           })}
-        </CardColumns>
+        </CardColumns> */}
       </Container>
     </>
   );
