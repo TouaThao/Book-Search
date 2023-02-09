@@ -6,16 +6,17 @@ import {
   Card,
   Button,
 } from "react-bootstrap";
-
 import { useQuery, useMutation } from "@apollo/react-hooks";
+
 import Auth from "../utils/auth";
-import { removeBookId } from "../utils/localStorage";
+import { removeBookId, saveBookIds } from "../utils/localStorage";
 import { QUERY_ME } from "../utils/queries";
 import { REMOVE_BOOK } from "../utils/mutation";
 
 const SavedBooks = () => {
   const { loading, data } = useQuery(QUERY_ME);
-  const userData = data?.me || {};
+  const userData = data?.me || [];
+
   const [removeBook, { error }] = useMutation(REMOVE_BOOK);
 
   const handleDeleteBook = async (bookId) => {
@@ -24,10 +25,13 @@ const SavedBooks = () => {
       return false;
     }
     try {
-      const { data } = await removeBook({
-        variables: { bookId },
+      const response = await removeBook({
+        variables: { bookId: bookId },
       });
-      // upon success, remove book's id from localStorage
+
+      if (!response) {
+        throw new Error("something went wrong!");
+      }
       removeBookId(bookId);
     } catch (err) {
       console.error(error);
@@ -39,6 +43,10 @@ const SavedBooks = () => {
     return <h2>LOADING...</h2>;
   }
 
+  // sync localStorage with what was returned from the userData query
+  const savedBookIds = userData.savedBooks.map((book) => book.bookId);
+  saveBookIds(savedBookIds);
+
   return (
     <>
       <Jumbotron fluid className="text-light bg-dark">
@@ -48,14 +56,14 @@ const SavedBooks = () => {
       </Jumbotron>
       <Container>
         <h2>
-          {userData.savedBooks?.length
+          {userData.savedBooks.length
             ? `Viewing ${userData.savedBooks.length} saved ${
                 userData.savedBooks.length === 1 ? "book" : "books"
               }:`
             : "You have no saved books!"}
         </h2>
         <CardColumns>
-          {userData.savedBooks?.map((book) => {
+          {userData.savedBooks.map((book) => {
             return (
               <Card key={book.bookId} border="dark">
                 {book.image ? (
