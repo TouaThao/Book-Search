@@ -28,7 +28,7 @@ const SavedBooks = () => {
       });
       removeBookId(bookId);
     } catch (err) {
-      console.error(error);
+      console.error(err);
     }
   };
 
